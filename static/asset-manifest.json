@@ -1,13 +1,13 @@
 {
-  "main.css": "/react-filemanager/static/css/main.b7fee832.chunk.css",
-  "main.js": "/react-filemanager/static/js/main.b2d247c5.chunk.js",
-  "main.js.map": "/react-filemanager/static/js/main.b2d247c5.chunk.js.map",
-  "static/js/1.be4011e5.chunk.js": "/react-filemanager/static/js/1.be4011e5.chunk.js",
-  "static/js/1.be4011e5.chunk.js.map": "/react-filemanager/static/js/1.be4011e5.chunk.js.map",
+  "main.css": "/react-filemanager/static/css/main.89ba8b64.chunk.css",
+  "main.js": "/react-filemanager/static/js/main.4dd2a094.chunk.js",
+  "main.js.map": "/react-filemanager/static/js/main.4dd2a094.chunk.js.map",
+  "static/js/1.f76c147c.chunk.js": "/react-filemanager/static/js/1.f76c147c.chunk.js",
+  "static/js/1.f76c147c.chunk.js.map": "/react-filemanager/static/js/1.f76c147c.chunk.js.map",
   "runtime~main.js": "/react-filemanager/static/js/runtime~main.5c124bc8.js",
   "runtime~main.js.map": "/react-filemanager/static/js/runtime~main.5c124bc8.js.map",
-  "static/css/main.b7fee832.chunk.css.map": "/react-filemanager/static/css/main.b7fee832.chunk.css.map",
+  "static/css/main.89ba8b64.chunk.css.map": "/react-filemanager/static/css/main.89ba8b64.chunk.css.map",
   "index.html": "/react-filemanager/index.html",
-  "precache-manifest.56462917befa6eb2b985611120d3e4f1.js": "/react-filemanager/precache-manifest.56462917befa6eb2b985611120d3e4f1.js",
+  "precache-manifest.0d53d5853d2fb7fb423c4e29f8b96673.js": "/react-filemanager/precache-manifest.0d53d5853d2fb7fb423c4e29f8b96673.js",
   "service-worker.js": "/react-filemanager/service-worker.js"
 }
