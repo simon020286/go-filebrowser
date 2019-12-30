@@ -15,10 +15,12 @@ import (
 )
 
 var fu utils.IFileUtils
+var tasks utils.Tasks
 
 func main() {
 	basePath := os.Getenv("BASEPATH")
 	fu = utils.NewFileUtils(basePath)
+	tasks = utils.NewTasks()
 
 	router := fasthttprouter.New()
 
@@ -30,6 +32,7 @@ func main() {
 	router.POST("/filemanager/items/remove", remove)
 	router.POST("/filemanager/items/upload", upload)
 	router.GET("/filemanager/file/content", content)
+	router.GET("/filemanager/tasks", taskList)
 
 	log.Fatal(fasthttp.ListenAndServe(":8080", cors(router.Handler)))
 }
@@ -107,16 +110,26 @@ func copyMoveHandler(copy bool) fasthttp.RequestHandler {
 				var (
 					size int64
 					err  error
+					task models.Task
 				)
+				src := path.Join(body.Path, filename)
+				dst := path.Join(body.Destination, filename)
+
 				if copy {
-					size, err = fu.Copy(path.Join(body.Path, filename), path.Join(body.Destination, filename))
+					task = models.NewCopyTask(src, dst)
+					tasks.Add(&task)
+					size, err = fu.Copy(src, dst)
 				} else {
-					size, err = fu.Move(path.Join(body.Path, filename), path.Join(body.Destination, filename))
+					task = models.NewMoveTask(src, dst)
+					tasks.Add(&task)
+					size, err = fu.Move(src, dst)
 				}
 				if err != nil {
+					task.End(err)
 					reject(err)
 					return
 				}
+				task.End(nil)
 				resolve(size)
 				return
 			}))
@@ -166,6 +179,12 @@ func content(ctx *fasthttp.RequestCtx) {
 	filename := filepath.Base(src)
 	ctx.Response.Header.Add("Content-Disposition", "attachment; filename=\""+filename+"\"")
 	ctx.SendFile(fu.GetAbsolutePath(src))
+}
+
+func taskList(ctx *fasthttp.RequestCtx) {
+	list := tasks.All()
+	models.NewAPIResponse(models.OptionData(list)).Send(ctx)
+	tasks.CleanEnded()
 }
 
 func cors(next fasthttp.RequestHandler) fasthttp.RequestHandler {
