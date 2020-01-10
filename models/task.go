@@ -21,12 +21,13 @@ const (
 
 // Task struct definition.
 type Task struct {
-	Type      uint8
-	Name      string
-	StartedAt time.Time
-	EndedAt   time.Time
-	Status    uint8
-	Error     error
+	Type      uint8     `json:"type"`
+	Name      string    `json:"name"`
+	StartedAt time.Time `json:"startedAt"`
+	EndedAt   time.Time `json:"endedAt"`
+	Status    uint8     `json:"status"`
+	Error     error     `json:"error"`
+	OnEnded   func()    `json:"-"`
 }
 
 // End task.
@@ -34,6 +35,9 @@ func (task *Task) End(err error) error {
 	task.Status = StatusEnded
 	task.EndedAt = time.Now()
 	task.Error = err
+	if task.OnEnded != nil {
+		task.OnEnded()
+	}
 	return err
 }
 

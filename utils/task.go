@@ -8,7 +8,10 @@ import (
 
 // Tasks utils.
 type Tasks struct {
-	list map[uuid.UUID]*models.Task
+	list          map[uuid.UUID]*models.Task
+	OnAddedTask   func(id uuid.UUID, task *models.Task)
+	OnRemovedTask func(id uuid.UUID, task *models.Task)
+	OnEndedTask   func(id uuid.UUID, task *models.Task)
 }
 
 // NewTasks constructor.
@@ -22,6 +25,14 @@ func NewTasks() Tasks {
 func (tasks *Tasks) Add(task *models.Task) uuid.UUID {
 	id := uuid.New()
 	tasks.list[id] = task
+	if tasks.OnAddedTask != nil {
+		tasks.OnAddedTask(id, task)
+	}
+	if tasks.OnEndedTask != nil {
+		task.OnEnded = func() {
+			tasks.OnEndedTask(id, task)
+		}
+	}
 	return id
 }
 
@@ -42,7 +53,12 @@ func (tasks *Tasks) All() []*models.Task {
 
 // Remove task.
 func (tasks *Tasks) Remove(id uuid.UUID) {
-	delete(tasks.list, id)
+	if task, ok := tasks.list[id]; ok {
+		delete(tasks.list, id)
+		if tasks.OnRemovedTask != nil {
+			tasks.OnRemovedTask(id, task)
+		}
+	}
 }
 
 // CleanEnded all ended tasks.

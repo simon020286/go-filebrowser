@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"filebrowser/models"
 	"filebrowser/utils"
+	"filebrowser/ws"
 	"log"
 	"os"
 	"path"
@@ -11,16 +12,22 @@ import (
 
 	"github.com/buaazp/fasthttprouter"
 	"github.com/chebyrash/promise"
+	"github.com/google/uuid"
 	"github.com/valyala/fasthttp"
 )
 
-var fu utils.IFileUtils
-var tasks utils.Tasks
+var (
+	fu    utils.IFileUtils
+	tasks utils.Tasks
+	hub   *ws.Hub
+)
 
 func main() {
 	basePath := os.Getenv("BASEPATH")
 	fu = utils.NewFileUtils(basePath)
 	tasks = utils.NewTasks()
+	hub = ws.NewHub()
+	go hub.Run()
 
 	router := fasthttprouter.New()
 
@@ -33,8 +40,22 @@ func main() {
 	router.POST("/filemanager/items/upload", upload)
 	router.GET("/filemanager/file/content", content)
 	router.GET("/filemanager/tasks", taskList)
+	router.GET("/filemanager/ws", provaWs)
+	router.GET("/ws", hub.ServeWs)
+
+	tasks.OnAddedTask = func(id uuid.UUID, task *models.Task) {
+		hub.Broadcast("task added", (*task))
+	}
+
+	tasks.OnEndedTask = func(id uuid.UUID, task *models.Task) {
+		hub.Broadcast("task ended", (*task))
+	}
 
 	log.Fatal(fasthttp.ListenAndServe(":8080", cors(router.Handler)))
+}
+
+func provaWs(ctx *fasthttp.RequestCtx) {
+	hub.Broadcast("prova", models.Task{Name: "Prova"})
 }
 
 func list(ctx *fasthttp.RequestCtx) {
