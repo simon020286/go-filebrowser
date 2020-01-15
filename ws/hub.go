@@ -75,5 +75,5 @@ func (h *Hub) Run() {
 
 // Broadcast message to all clients.
 func (h *Hub) Broadcast(event string, payload interface{}) {
-	h.broadcast <- Message{Event: event, Data: payload}
+	h.broadcast <- NewMessage(event, payload)
 }
